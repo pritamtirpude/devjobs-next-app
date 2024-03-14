@@ -21,23 +21,44 @@ import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import Spinner from '../Spinner/Spinner';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { JobType } from '@/utils/types';
 import { createJobAction } from '@/utils/action';
 import { JobContract, addJobSchema } from '@/utils/schema';
+import { useToast } from '../ui/use-toast';
+import { useRouter } from 'next/navigation';
 
 const CreateJob = () => {
   const [requirementValue, setRequirementValue] = useState<string>('');
   const [roleValue, setRoleValue] = useState<string>('');
+
+  const { toast } = useToast();
+
+  const router = useRouter();
+
+  const queryClient = useQueryClient();
+
   const createJobMutation = useMutation({
     mutationKey: ['addjob'],
     mutationFn: (payload: JobType) => createJobAction(payload),
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
+      toast({
+        variant: 'default',
+        title: 'Job created successfully',
+      });
       form.reset();
+      router.push('/jobs');
+      queryClient.invalidateQueries({ queryKey: ['jobslist'] });
+    },
+    onError: () => {
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong',
+      });
     },
   });
 
@@ -200,7 +221,7 @@ const CreateJob = () => {
                 >
                   <FormControl>
                     <SelectTrigger
-                      className={`bg-white p-6 text-secondary-dark-darkBlue focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 ${form.formState.errors.contract ? 'border-2 border-red-500' : ''}`}
+                      className={`border-2 bg-white p-6 text-secondary-dark-darkBlue focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 ${form.formState.errors.contract ? ' border-red-500' : 'border-secondary-dark-gray'}`}
                     >
                       <SelectValue
                         placeholder="Select a contract"
@@ -516,10 +537,15 @@ const CreateJob = () => {
 
           <div className="mt-4 flex w-full items-center justify-center md:col-span-2 lg:col-span-2">
             <Button
+              disabled={createJobMutation.isPending}
               type="submit"
               className="w-full bg-primary-light-violet px-8 py-4 font-bold text-white transition-opacity hover:opacity-50 dark:bg-secondary-dark-darkBlue  md:w-1/3 lg:w-1/3"
             >
-              Submit
+              {createJobMutation.isPending ? (
+                <Spinner isPending={createJobMutation.isPending} />
+              ) : (
+                'Submit'
+              )}
             </Button>
           </div>
         </form>
