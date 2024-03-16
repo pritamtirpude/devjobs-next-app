@@ -34,3 +34,44 @@ export async function createJobAction(
     return null;
   }
 }
+
+export async function getAllJobsAction(): Promise<JobType[] | null> {
+  const userId = checkAuthorization();
+  try {
+    const jobs: JobType[] = await prisma.job.findMany({
+      where: {
+        clerkId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return jobs;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export async function getSingleJob(id: string): Promise<JobType | null> {
+  let job: JobType | null = null;
+  const userId = checkAuthorization();
+
+  try {
+    job = await prisma.job.findUnique({
+      where: {
+        id,
+        clerkId: userId,
+      },
+    });
+  } catch (error) {
+    job = null;
+  }
+
+  if (!job) {
+    redirect('/jobs');
+  }
+
+  return job;
+}

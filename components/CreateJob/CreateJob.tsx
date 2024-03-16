@@ -52,7 +52,7 @@ const CreateJob = () => {
       });
       form.reset();
       router.push('/jobs');
-      queryClient.invalidateQueries({ queryKey: ['jobslist'] });
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
     },
     onError: () => {
       toast({

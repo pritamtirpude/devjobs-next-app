@@ -2,10 +2,18 @@
 
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import { getAllJobsAction } from '@/utils/action';
+import { useQuery } from '@tanstack/react-query';
+import JobsList from '@/components/JobsList/JobsList';
 
 const JobsPage = () => {
   const router = useRouter();
+
+  const { data: jobsData, isLoading } = useQuery({
+    queryKey: ['jobs'],
+    queryFn: () => getAllJobsAction(),
+  });
+
   return (
     <div className="mt-11">
       <Button
@@ -15,6 +23,8 @@ const JobsPage = () => {
       >
         Add Job
       </Button>
+
+      {isLoading ? <h1>Loading...</h1> : <JobsList jobsData={jobsData || []} />}
     </div>
   );
 };
