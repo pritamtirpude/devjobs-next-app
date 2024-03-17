@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
 import { JobType } from './types';
 import { addJobSchema } from './schema';
+import { Prisma } from '@prisma/client';
 
 const checkAuthorization = (): string => {
   const { userId } = auth();
@@ -35,13 +36,73 @@ export async function createJobAction(
   }
 }
 
-export async function getAllJobsAction(): Promise<JobType[] | null> {
+type getAllJobTypes = {
+  search: string;
+  location: string;
+  contract: string;
+};
+
+export async function getAllJobsAction({
+  search,
+  location,
+  contract,
+}: getAllJobTypes): Promise<JobType[] | null> {
   const userId = checkAuthorization();
   try {
+    let whereClause: Prisma.JobWhereInput = {
+      clerkId: userId,
+    };
+
+    if (search) {
+      whereClause = {
+        ...whereClause,
+        OR: [
+          {
+            position: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            company: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      };
+    }
+
+    if (location) {
+      whereClause = {
+        ...whereClause,
+        OR: [
+          {
+            location: {
+              contains: location,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      };
+    }
+
+    if (contract) {
+      whereClause = {
+        ...whereClause,
+        OR: [
+          {
+            contract: {
+              contains: contract,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      };
+    }
+
     const jobs: JobType[] = await prisma.job.findMany({
-      where: {
-        clerkId: userId,
-      },
+      where: whereClause,
       orderBy: {
         createdAt: 'desc',
       },
