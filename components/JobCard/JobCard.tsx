@@ -15,7 +15,7 @@ const JobCard = ({ job }: JobCardProps) => {
       : '';
   return (
     <Link href={`/jobs/${job?.id}`}>
-      <Card className="border-0 bg-white shadow-lg focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-secondary-dark-darkBlue">
+      <Card className="border-0 bg-white shadow-sm focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-secondary-dark-darkBlue">
         <CardContent className="p-0">
           <div className="flex size-full flex-col justify-between gap-11 p-8">
             <div className="size-full flex-1">

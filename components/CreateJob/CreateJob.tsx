@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { XCircle, PlusCircle } from 'lucide-react';
+import { XCircle, PlusCircle, MoveLeft } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
@@ -135,6 +135,16 @@ const CreateJob = () => {
 
   return (
     <div className="py-20">
+      <div className="mb-4 flex w-full items-center justify-end">
+        <Button
+          onClick={() => router.push('/jobs')}
+          variant="default"
+          className="bg-primary-light-violet py-4 font-bold text-white transition-opacity  hover:opacity-50 dark:bg-secondary-dark-darkBlue"
+        >
+          <MoveLeft className="mr-2 size-4 " />
+          Go Back
+        </Button>
+      </div>
       <Form {...form}>
         <h1 className="mb-2 font-bold text-primary-light-violet">
           Company Details
